@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambiance Cozy</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Import Google Font: Press Start 2P (Arcade style font) -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* Utilisation de la police arcade */
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #f5f0e1; /* Warm beige */
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        iframe {
+            width: 420px; /* Réduction de la largeur */
+            height: 240px;
+            border: none;
+            border-radius: 15px; /* Bords arrondis */
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Effet ombré pour un style plus cozy */
+            opacity: 0; /* L'iframe est cachée visuellement */
+            visibility: hidden; /* Masquer complètement l'iframe */
+        }
+
+        #exitFullscreenBtn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: none;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 9999;
+        }
+
+        /* Animations longues et douces */
+        .animate-long {
+            transition: all 1.5s ease;
+        }
+
+        /* Cacher la souris */
+        .hide-cursor {
+            cursor: none;
+        }
+
+        /* Utilisation des couleurs douces */
+        .bg-beige {
+            background-color: #f5f0e1;
+        }
+
+        .bg-yellow {
+            background-color: #F9D376; /* Jaune */
+        }
+
+        /* Message en bas de la page, plus petit */
+        .footer-message {
+            position: absolute;
+            bottom: 10px;
+            font-size: 10px;
+            color: #555;
+        }
+
+        /* Version du site en bas à droite, plus clair, plus petit, et caché en fullscreen */
+        .version-info {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 8px;
+            color: rgba(85, 85, 85, 0.6); /* Plus clair */
+            transition: opacity 0.3s ease;
+        }
+
+        .hide-version {
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center h-screen text-gray-800 animate-long flex-col">
+
+    <div class="text-center flex flex-col items-center" id="controlsContainer">
+        <h1 class="text-3xl font-semibold mb-6 text-gray-700">Ambiance Cozy</h1>
+        
+        <!-- Buttons for selecting colors (white, beige, and yellow) -->
+        <div class="mb-4 space-x-4">
+            <button id="whiteBtn" class="bg-white border border-gray-300 px-4 py-2 rounded shadow animate-long">Blanc</button>
+            <button id="beigeBtn" class="bg-beige border border-gray-300 px-4 py-2 rounded shadow animate-long">Beige</button>
+            <button id="yellowBtn" class="bg-yellow border border-gray-300 px-4 py-2 rounded shadow animate-long">Jaune</button>
+        </div>
+        
+        <!-- Color picker for custom color with label -->
+        <label for="colorPicker" class="block text-sm text-gray-600 mb-2">Choisissez une couleur personnalisée :</label>
+        <input type="color" id="colorPicker" value="#f5f0e1" class="mb-4 p-2 rounded border border-gray-300 animate-long">
+        
+        <!-- Max brightness button -->
+        <button id="maxBrightnessBtn" class="mb-4 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded shadow animate-long">Luminosité Max</button>
+        
+        <!-- Music selection dropdown -->
+        <select id="musicSelect" class="mb-4 p-2 rounded border border-gray-300 animate-long">
+            <option value="">Choisir un Live YouTube</option>
+            <option value="https://www.youtube.com/embed/jfKfPfyJRdk">Lo-Fi Girl</option>
+            <option value="https://www.youtube.com/embed/4xDzrJKXOOY">Synthwave Boy</option>
+        </select>
+
+        <!-- Custom YouTube URL input -->
+        <input type="text" id="youtubeUrlInput" placeholder="Collez votre lien YouTube ici" class="mb-4 p-2 rounded border border-gray-300 animate-long w-4/5">
+
+        <!-- Buttons for toggling and fullscreen -->
+        <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4">
+            <button id="playCustomUrl" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded shadow animate-long">Lancer URL YouTube</button>
+            <button id="toggleIframeBtn" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded shadow animate-long hidden">Cacher la vidéo</button>
+            <button id="fullscreenBtn" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded shadow animate-long">Plein écran</button>
+        </div>
+    </div>
+
+    <!-- Audio Player iframe -->
+    <iframe id="audioPlayer" class="animate-long"></iframe>
+
+    <!-- Exit fullscreen button -->
+    <button id="exitFullscreenBtn">Quitter le plein écran</button>
+
+    <!-- Message en bas de la page avec lien cliquable -->
+    <h7 class="footer-message">
+        Fait par <a href="https://github.com/aritheprogramer" target="_blank" class="text-blue-500"> @aritheprogramer</a> avec ❤️
+    </h7>
+
+    <!-- Version du site -->
+    <div class="version-info" id="versionInfo">Version Alpha</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const body = document.body;
+            const whiteBtn = document.getElementById('whiteBtn');
+            const beigeBtn = document.getElementById('beigeBtn');
+            const yellowBtn = document.getElementById('yellowBtn');
+            const colorPicker = document.getElementById('colorPicker');
+            const maxBrightnessBtn = document.getElementById('maxBrightnessBtn');
+            const musicSelect = document.getElementById('musicSelect');
+            const audioPlayer = document.getElementById('audioPlayer');
+            const youtubeUrlInput = document.getElementById('youtubeUrlInput');
+            const playCustomUrl = document.getElementById('playCustomUrl');
+            const toggleIframeBtn = document.getElementById('toggleIframeBtn');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            const exitFullscreenBtn = document.getElementById('exitFullscreenBtn');
+            const controlsContainer = document.getElementById('controlsContainer');
+            const versionInfo = document.getElementById('versionInfo');
+
+            let hideTimeout;
+
+            // Fonction pour détecter si l'utilisateur est en plein écran
+            function isFullscreen() {
+                return document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+            }
+
+            // Fonction pour masquer le bouton et la souris en mode plein écran après 3 secondes d'inactivité
+            function hideCursorAndControls() {
+                if (isFullscreen()) {
+                    body.classList.add('hide-cursor');
+                    exitFullscreenBtn.style.display = 'none'; // Masquer le bouton en plein écran
+                    versionInfo.classList.add('hide-version'); // Masquer la version en plein écran
+                }
+            }
+
+            // Fonction pour afficher la souris, le bouton, et la version lorsque l'utilisateur bouge la souris
+            function showCursorAndControls() {
+                if (isFullscreen()) {
+                    body.classList.remove('hide-cursor');
+                    exitFullscreenBtn.style.display = 'block'; // Afficher le bouton en plein écran
+                    versionInfo.classList.remove('hide-version'); // Afficher la version
+                    if (hideTimeout) {
+                        clearTimeout(hideTimeout);
+                    }
+                    hideTimeout = setTimeout(hideCursorAndControls, 3000); // 3 secondes d'inactivité
+                }
+            }
+
+            // Événements de souris pour afficher ou cacher la souris, le bouton et la version en mode plein écran
+            document.addEventListener('mousemove', () => {
+                showCursorAndControls();
+            });
+            
+               maxBrightnessBtn.addEventListener('click', () => {
+                alert('Veuillez augmenter manuellement la luminosité de votre appareil pour un meilleur effet.');
+            });
+
+            // Gestion des couleurs de fond
+            whiteBtn.addEventListener('click', () => {
+                body.style.backgroundColor = '#ffffff';
+            });
+
+            beigeBtn.addEventListener('click', () => {
+                body.style.backgroundColor = '#f5f0e1';
+            });
+
+            yellowBtn.addEventListener('click', () => {
+                body.style.backgroundColor = '#F9D376';
+            });
+
+            colorPicker.addEventListener('input', (e) => {
+                body.style.backgroundColor = e.target.value;
+            });
+
+            // Passer en mode plein écran
+            fullscreenBtn.addEventListener('click', () => {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.mozRequestFullScreen) {
+                    document.documentElement.mozRequestFullScreen();
+                } else if (document.documentElement.webkitRequestFullscreen) {
+                    document.documentElement.webkitRequestFullscreen();
+                } else if (document.documentElement.msRequestFullscreen) {
+                    document.documentElement.msRequestFullscreen();
+                }
+
+                controlsContainer.classList.add('hidden');
+                exitFullscreenBtn.style.display = 'block';
+                showCursorAndControls(); // Forcer l'affichage initial
+            });
+
+            // Quitter le mode plein écran
+            exitFullscreenBtn.addEventListener('click', () => {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+                controlsContainer.classList.remove('hidden');
+                exitFullscreenBtn.style.display = 'none';
+                versionInfo.classList.remove('hide-version'); // Afficher la version après le plein écran
+            });
+
+            // Lancer un live depuis la sélection ou une URL personnalisée
+            function playLive(url) {
+                audioPlayer.src = url + "?autoplay=1&mute=0";
+                audioPlayer.style.opacity = '1'; // Afficher l'iframe
+                audioPlayer.style.visibility = 'visible'; // Rendre visible
+                toggleIframeBtn.classList.remove('hidden'); // Montrer le bouton pour cacher l'iframe
+            }
+
+            // Sélection d'un live YouTube prédéfini
+            musicSelect.addEventListener('change', (e) => {
+                const selectedStream = e.target.value;
+                if (selectedStream) {
+                    playLive(selectedStream);
+                }
+            });
+
+            // Jouer un URL personnalisé
+            playCustomUrl.addEventListener('click', () => {
+                let youtubeUrl = youtubeUrlInput.value;
+                if (youtubeUrl) {
+                    let embedUrl = youtubeUrl.replace("watch?v=", "embed/"); // Convertir en URL embed
+                    playLive(embedUrl);
+                } else {
+                    alert("Veuillez entrer un lien YouTube valide.");
+                }
+            });
+
+            // Cacher l'iframe (live vidéo)
+            toggleIframeBtn.addEventListener('click', () => {
+                if (audioPlayer.style.visibility === 'hidden') {
+                    audioPlayer.style.opacity = '1';
+                    audioPlayer.style.visibility = 'visible';
+                    toggleIframeBtn.textContent = 'Cacher la vidéo';
+                } else {
+                    audioPlayer.style.opacity = '0';
+                    audioPlayer.style.visibility = 'hidden';
+                    toggleIframeBtn.textContent = 'Afficher la vidéo';
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
