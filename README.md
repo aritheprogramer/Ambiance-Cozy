@@ -3,7 +3,9 @@
 
 Un metteur d'ambiance lumière avec un player youtube pour mettre sa musique préférée
 
-Pas encore disponible en ligne
+[Accéder au site](https://aritheprogramer.github.io/Ambiance-Cozy/)
+
+
 
 ## Couleurs utilisées
 
@@ -17,5 +19,6 @@ Pas encore disponible en ligne
 
 ## Capture d'écran
 
-![App Screenshot](https://i.ibb.co/sJX3VNz/bebou-2024-09-09-a-01-46-20.png)
+![App Screenshot](https://cdn.discordapp.com/attachments/1109888556702380175/1282569301588705280/bebou_2024-09-09_a_01.46.20.png?ex=66dfd53e&is=66de83be&hm=a55bdb6d06737f71ec1405769d87ae59cf54d1b1aca50e0095efd08c4d376519&)
+
 
