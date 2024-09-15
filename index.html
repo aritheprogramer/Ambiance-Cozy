@@ -8,8 +8,83 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Import Google Font: Press Start 2P (Arcade style font) -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
-    
+    <style>
+        /* Utilisation de la police arcade */
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #f5f0e1; /* Warm beige */
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        iframe {
+            width: 420px; /* Réduction de la largeur */
+            height: 240px;
+            border: none;
+            border-radius: 15px; /* Bords arrondis */
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Effet ombré pour un style plus cozy */
+            opacity: 0; /* L'iframe est cachée visuellement */
+            visibility: hidden; /* Masquer complètement l'iframe */
+        }
+
+        #exitFullscreenBtn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: none;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 9999;
+        }
+
+        /* Animations longues et douces */
+        .animate-long {
+            transition: all 1.5s ease;
+        }
+
+        /* Cacher la souris */
+        .hide-cursor {
+            cursor: none;
+        }
+
+        /* Utilisation des couleurs douces */
+        .bg-beige {
+            background-color: #f5f0e1;
+        }
+
+        .bg-yellow {
+            background-color: #F9D376; /* Jaune */
+        }
+
+        /* Message en bas de la page, plus petit */
+        .footer-message {
+            position: absolute;
+            bottom: 10px;
+            font-size: 10px;
+            color: #555;
+        }
+
+        /* Version du site en bas à droite, plus clair, plus petit, et caché en fullscreen */
+        .version-info {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 8px;
+            color: rgba(85, 85, 85, 0.6); /* Plus clair */
+            transition: opacity 0.3s ease;
+        }
+
+        .hide-version {
+            opacity: 0;
+        }
+    </style>
 </head>
 <body class="flex items-center justify-center h-screen text-gray-800 animate-long flex-col">
 
