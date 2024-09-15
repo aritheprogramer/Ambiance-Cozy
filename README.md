@@ -54,10 +54,6 @@ Les contributions sont les bienvenues ! Si vous souhaitez améliorer cette appli
 
 - **[aritheprogramer](https://github.com/aritheprogramer)** - Développeur principal
 
-## Licence
-
-Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
-
 ---
 
 Fait avec ❤️ par [@aritheprogramer](https://github.com/aritheprogramer)
