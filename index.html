@@ -84,6 +84,11 @@
         .hide-version {
             opacity: 0;
         }
+
+        /* Bouton autoplay caché */
+        .autoplay-btn {
+            display: none;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center h-screen text-gray-800 animate-long flex-col">
@@ -113,14 +118,17 @@
         </select>
 
         <!-- Custom YouTube URL input -->
-        <input type="text" id="youtubeUrlInput" placeholder="Collez votre lien YouTube ici" class="mb-4 p-2 rounded border border-gray-300 animate-long w-4/5">
+        <input type="text" id="youtubeUrlInput" placeholder="Collez votre lien YouTube ou playlist ici" class="mb-4 p-2 rounded border border-gray-300 animate-long w-4/5">
 
         <!-- Buttons for toggling and fullscreen -->
         <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4">
-            <button id="playCustomUrl" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded shadow animate-long">Lancer URL YouTube</button>
+            <button id="playCustomUrl" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded shadow animate-long">Lancer URL/Playlist YouTube</button>
             <button id="toggleIframeBtn" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded shadow animate-long hidden">Cacher la vidéo</button>
             <button id="fullscreenBtn" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded shadow animate-long">Plein écran</button>
         </div>
+
+        <!-- Bouton caché pour lancer l'autoplay -->
+        <button id="hiddenAutoplayBtn" class="autoplay-btn">Lancer la vidéo</button>
     </div>
 
     <!-- Audio Player iframe -->
@@ -135,7 +143,7 @@
     </h7>
 
     <!-- Version du site -->
-    <div class="version-info" id="versionInfo">Version Alpha</div>
+    <div class="version-info" id="versionInfo">Version Alpha 0.2</div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -152,6 +160,7 @@
             const toggleIframeBtn = document.getElementById('toggleIframeBtn');
             const fullscreenBtn = document.getElementById('fullscreenBtn');
             const exitFullscreenBtn = document.getElementById('exitFullscreenBtn');
+            const hiddenAutoplayBtn = document.getElementById('hiddenAutoplayBtn');
             const controlsContainer = document.getElementById('controlsContainer');
             const versionInfo = document.getElementById('versionInfo');
 
@@ -189,7 +198,7 @@
                 showCursorAndControls();
             });
             
-               maxBrightnessBtn.addEventListener('click', () => {
+            maxBrightnessBtn.addEventListener('click', () => {
                 alert('Veuillez augmenter manuellement la luminosité de votre appareil pour un meilleur effet.');
             });
 
@@ -243,13 +252,29 @@
                 versionInfo.classList.remove('hide-version'); // Afficher la version après le plein écran
             });
 
-            // Lancer un live depuis la sélection ou une URL personnalisée
+            // Lancer un live depuis la sélection ou une URL personnalisée (playlist supportée)
             function playLive(url) {
-                audioPlayer.src = url + "?autoplay=1&mute=0";
+                if (url.includes('list=')) {
+                    // Playlist detected
+                    audioPlayer.src = url + "&autoplay=1&mute=0";
+                } else {
+                    // Single video
+                    audioPlayer.src = url + "?autoplay=1&mute=0";
+                }
                 audioPlayer.style.opacity = '1'; // Afficher l'iframe
                 audioPlayer.style.visibility = 'visible'; // Rendre visible
                 toggleIframeBtn.classList.remove('hidden'); // Montrer le bouton pour cacher l'iframe
+                
+                // Simuler l'interaction utilisateur
+                setTimeout(() => {
+                    hiddenAutoplayBtn.click(); // Déclencher l'autoplay simulé
+                }, 500);
             }
+
+            // Simuler un clic utilisateur pour activer l'autoplay
+            hiddenAutoplayBtn.addEventListener('click', () => {
+                audioPlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+            });
 
             // Sélection d'un live YouTube prédéfini
             musicSelect.addEventListener('change', (e) => {
@@ -259,11 +284,11 @@
                 }
             });
 
-            // Jouer un URL personnalisé
+            // Jouer un URL personnalisé ou une playlist
             playCustomUrl.addEventListener('click', () => {
                 let youtubeUrl = youtubeUrlInput.value;
                 if (youtubeUrl) {
-                    let embedUrl = youtubeUrl.replace("watch?v=", "embed/"); // Convertir en URL embed
+                    let embedUrl = youtubeUrl.includes('list=') ? youtubeUrl : youtubeUrl.replace("watch?v=", "embed/"); // Convertir en URL embed ou playlist
                     playLive(embedUrl);
                 } else {
                     alert("Veuillez entrer un lien YouTube valide.");
